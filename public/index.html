@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TaskMan - Home</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    input, button {
+      margin: 5px;
+      padding: 8px;
+      font-size: 16px;
+    }
+    #newAccessKey {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome to TaskMan</h1>
+
+  <div>
+    <h2>Enter Access Key</h2>
+    <input type="text" id="accessKeyInput" placeholder="Access Key" />
+    <button onclick="enterAccessKey()">Enter</button>
+  </div>
+
+  <div>
+    <h2>Create New Task Group</h2>
+    <button onclick="createTaskGroup()">Create Group</button>
+    <p id="newAccessKey"></p>
+  </div>
+
+  <script>
+    async function enterAccessKey() {
+      const accessKey = document.getElementById('accessKeyInput').value.trim();
+      if (!accessKey) {
+        alert('Please enter an access key.');
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/task-groups/${accessKey}`);
+        const data = await response.json();
+        if (data.exists) {
+          window.location.href = `/tasks/${accessKey}`;
+        } else {
+          alert('Access key not found.');
+        }
+      } catch (error) {
+        console.error('Error validating access key:', error);
+        alert('An error occurred. Please try again.');
+      }
+    }
+
+    async function createTaskGroup() {
+      try {
+        const response = await fetch('/api/task-groups', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await response.json();
+        document.getElementById('newAccessKey').textContent = `New Access Key: ${data.access_key}`;
+      } catch (error) {
+        console.error('Error creating task group:', error);
+        alert('An error occurred. Please try again.');
+      }
+    }
+  </script>
+</body>
+</html>
